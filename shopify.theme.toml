@@ -1,0 +1,3 @@
+[environments.development]
+store = "edukid-revamp.myshopify.com"
+theme = "187660140824"

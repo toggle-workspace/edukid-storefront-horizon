@@ -9,10 +9,32 @@ Horizon is Shopify's flagship first-party theme, built on Liquid Storefronts and
 ## Commands
 
 - Validate/lint: `shopify theme check` (via [Shopify CLI](https://shopify.dev/docs/storefronts/themes/tools/cli))
-- Local dev server: `shopify theme dev`
+- Local dev server: `shopify theme dev --environment=development` (see Local development below — don't run bare `shopify theme dev`)
 - CI runs Theme Check on every commit via `Shopify/theme-check-action`.
 
 There are no other build/test commands in this checkout — schemas are edited directly in the `{% schema %}` block of each `.liquid` file (see Schemas below).
+
+### Local development — always pin the dev theme
+
+Connecting this repo to a store via the GitHub integration (Online Store → Themes) only syncs *code* into a draft theme on push; it does not give local `shopify theme dev` access to live store data. That still requires running the Shopify CLI dev server.
+
+**Never run bare `shopify theme dev`.** With no `--theme`/`--environment` given, it seeds the new dev theme's settings from whatever theme is currently **published/live** on the store. If that live theme is a different theme (or an old/incompatible version of this one), the upload fails with a wall of schema errors (`Setting 'X' does not exist`, `default must be a color or dynamic source access path`, `Section type 'Y' does not refer to an existing section file`, etc.) — none of that means the theme code is broken, it means the seed data doesn't match this schema. It also litters the store's admin with a fresh `Development (...)` theme on every run.
+
+`shopify.theme.toml` at the repo root pins the store and theme ID so dev sessions always target the same, already-compatible theme instead:
+
+```toml
+[environments.development]
+store = "edukid-revamp.myshopify.com"
+theme = "187660140824"  # edukid-storefront-horizon/main, the GitHub-connected draft theme
+```
+
+Run local dev with:
+
+```sh
+shopify theme dev --environment=development
+```
+
+Check `shopify theme list` if the target theme's ID ever changes (e.g. it gets deleted/recreated) and update `theme` in `shopify.theme.toml` to match.
 
 ## Architecture
 
