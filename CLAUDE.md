@@ -6,6 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Horizon is Shopify's flagship first-party theme, built on Liquid Storefronts and theme blocks. This is a pure theme checkout — no `package.json`, build tooling, or test runner is present. Everything here is `.liquid`, `.json`, `.css`, and `.js` served directly to a Shopify store.
 
+### Scope: this repo is for components and code, not merchandising
+
+The connected theme (`edukid-storefront-horizon/main`) is edited from **two directions**: this repo pushes code via GitHub, and the **Shopify theme editor** pushes merchandising changes (colors, section/block settings, content) back to `main` as `shopify[bot]` commits. Both write to `config/settings_data.json`.
+
+To avoid this repo's commits fighting the theme editor's auto-synced commits:
+
+- **This repo/local dev is for**: creating and editing sections, blocks, snippets, CSS, JS, and schema *definitions* (`{% schema %}` settings, `config/settings_schema.json`).
+- **Leave to the Shopify theme editor**: `config/settings_data.json` values, section/block instance settings, template composition (which sections/blocks are placed where with what settings) — anything that's really merchandising, not component code.
+- Don't use `theme-skill` (below) to edit `config/settings_data.json` or template instance settings on this project unless explicitly asked — that's the theme editor's territory now.
+- Before pushing, always fetch/check `origin/main` for new `shopify[bot]` sync commits rather than force-pushing (see Local development below).
+
+**Bypass:** this is a default, not a hard rule. If the user explicitly asks to edit `config/settings_data.json` or compose template instance settings/merchandising (e.g. "update settings_data for X", "use theme-skill to build this page"), do it — just fetch/merge `origin/main` first so you're not clobbering a recent `shopify[bot]` sync commit.
+
 ## Commands
 
 - Validate/lint: `shopify theme check` (via [Shopify CLI](https://shopify.dev/docs/storefronts/themes/tools/cli))
@@ -84,4 +97,4 @@ Detailed, topic-specific rules (one file per concern) live in `.cursor/rules/*.m
 
 ## Skills
 
-- `theme-skill` (`.claude/skills/theme-skill/`) — use for **JSON-only** page-building work: `templates/*.json`, section/block instance settings, `config/settings_data.json`, `config/settings_schema.json`. It composes pages out of this theme's *existing* sections/blocks and their schemas. Do **not** use it when creating or editing the sections/blocks/snippets themselves (new Liquid, JS, CSS, or new schema settings) — that's regular Liquid component work governed by the conventions and `.cursor/rules/*.mdc` files above.
+- `theme-skill` (`.claude/skills/theme-skill/`) — JSON-only page-building: `templates/*.json`, section/block instance settings, `config/settings_data.json`. Given this project's scope (see "Scope" above), avoid this for `config/settings_data.json` or template instance settings unless explicitly asked — that's the Shopify theme editor's territory. `config/settings_schema.json` (setting *definitions*, not values) is still fair game as regular schema work. Never use it for creating or editing the sections/blocks/snippets themselves (new Liquid, JS, CSS) — that's regular component work governed by the conventions and `.cursor/rules/*.mdc` files above.
