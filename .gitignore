@@ -1,0 +1,14 @@
+# Local tooling artifacts
+.playwright-mcp/
+.shopify/
+
+# OS
+.DS_Store
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+
+# Node (in case any local tooling is added later)
+node_modules/
+npm-debug.log*
